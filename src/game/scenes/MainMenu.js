@@ -8,7 +8,7 @@ export class MainMenu extends BaseScene {
   create() {
     super.create();
 
-    this.add.image(512, 384, 'background');
+    // this.add.image(512, 384, 'background');
 
     // this.add.image(512, 300, 'logo');
 

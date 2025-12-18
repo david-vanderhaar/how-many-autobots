@@ -13,7 +13,8 @@ const config = {
   width: 1280,
   height: 720,
   parent: 'game-container',
-  backgroundColor: '#141516',
+  // backgroundColor: '#141516',
+  backgroundColor: '#e2dfbe',
   pixelArt: true,
   scale: {
     mode: Phaser.Scale.FIT,

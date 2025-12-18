@@ -11,76 +11,63 @@ export class CharacterPreview extends BaseScene {
   create() {
     super.create();
 
-    const steve = BaseCharacter(this, {
-      name: 'Steve',
-      spritesheetName: 'steve',
+    const optimus = BaseCharacter(this, {
+      name: 'optimus',
+      spritesheetName: 'optimus',
       x: 800,
       y: 470,
     });
 
-    steve.initializeAnimations();
-    steve.startAnimationPreview();
-    steve.initializePhysics();
-    this.characters.push(steve);
+    optimus.initializeAnimations();
+    optimus.startAnimationPreview();
+    optimus.initializePhysics();
+    this.characters.push(optimus);
+    
+    const decepticon = BaseCharacter(this, {
+      name: 'decepticon',
+      spritesheetName: 'decepticon',
+      x: 200,
+      y: 470,
+    });
 
-    this.input.gamepad.once('connected', function (pad) {
-      console.log('Gamepad connected:', pad.id);
-    }, this);
+    decepticon.initializeAnimations();
+    decepticon.startAnimationPreview();
+    decepticon.initializePhysics();
+    this.characters.push(decepticon);
+
+    setInterval(() => {
+      this.characters.forEach((character) => {
+        this.setRandomMovement(character);
+      });
+    }, 1000);
   }
 
-  update() {
-    processInputs(this, this.characters);
-  }
-}
+  // update() {
+  //   this.characters.forEach((character) => {
+  //     this.setRandomMovement(character);
+  //   });
+  // }
 
-function processInputs(scene, characters) {
-  const pads = scene.input.gamepad.gamepads;
+  setRandomMovement(character) {
+    const directions = ['left', 'right', 'idle'];
+    const choice = directions[Math.floor(Math.random() * directions.length)];
 
-  characters.forEach((character, index) => {
-    processCharacterGamepadInputs(scene, character, pads[index]);
-  });
-}
-
-function processCharacterGamepadInputs(scene, character, gamepad) {
-  if (!gamepad) {
-    return;
-  }
-
-  const sprite = character.sprite;
-
-  if (gamepad.left) {
-    sprite.x -= 4;
-    sprite.flipX = false;
-    character.play('walk');
-  } else if (gamepad.right) {
-    sprite.x += 4;
-    sprite.flipX = true;
-    character.play('walk');
-  } else if (gamepad.up) {
-    if (sprite.body.onFloor()) {
-      sprite.body.setVelocityY(-600);
-      character.play('jump');
-    }
-  } else if (gamepad.down) {
-    // sprite.y += 4;
-  } else if (gamepad.A) {
-    character.play('punch');
-  } else if (gamepad.B) {
-    character.play('kick');
-  } else if (gamepad.X) {
-    if (sprite.body.onFloor()) {
-      character.play('win');
-    }
-  } else if (gamepad.Y) {
-    character.play('die');
-  } 
-  else {
-    if (sprite.body.onFloor()) {
-      // character.play('idle');
-      // if characis walking, reset to idle
-      // if (sprite.anims.currentAnim.key === character.spritesheetName + '-walk') {
-      //   character.play('idle');
-      // }
+    switch (choice) {
+      case 'left':
+        character.sprite.body.setVelocityX(-character.speed * 100);
+        character.play('walk');
+        character.sprite.setFlipX(true);
+        break;
+      case 'right':
+        character.sprite.body.setVelocityX(character.speed * 100);
+        character.play('walk');
+        character.sprite.setFlipX(false);
+        break;
+      case 'idle':
+        character.sprite.body.setVelocityX(0);
+        character.play('idle');
+        break;
     }
   }
 }
+

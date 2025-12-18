@@ -29,6 +29,16 @@ export class Preloader extends BaseScene {
       'characters/steve.png', 
       { frameWidth: 48, frameHeight: 48 }
     );
+    this.load.spritesheet(
+      'optimus',
+      'characters/optimus.png', 
+      { frameWidth: 48, frameHeight: 48 }
+    );
+    this.load.spritesheet(
+      'decepticon',
+      'characters/decepticon.png', 
+      { frameWidth: 48, frameHeight: 48 }
+    );
   }
 
   create() {
