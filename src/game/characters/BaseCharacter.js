@@ -53,17 +53,17 @@ function startAnimationPreview(scene, sprite, spritesheetName, x , y ) {
 
   sprite.play(spritesheetName + '-idle');
 
-  // randomly change animation on pointer down
-  let c = Math.floor(Math.random() * keys.length);
-  scene.input.on('pointerdown', function () {
-    c++;
-    if (c === keys.length) {
-      c = 0;
-    }
-    const key = `${spritesheetName}-${keys[c]}`;
-    sprite.play(key);
-    current.setText('Playing: ' + key);
-  });
+  // // randomly change animation on pointer down
+  // let c = Math.floor(Math.random() * keys.length);
+  // scene.input.on('pointerdown', function () {
+  //   c++;
+  //   if (c === keys.length) {
+  //     c = 0;
+  //   }
+  //   const key = `${spritesheetName}-${keys[c]}`;
+  //   sprite.play(key);
+  //   // current.setText('Playing: ' + key);
+  // });
 }
 
 function play(sprite, spritesheetName, action) {

@@ -35,20 +35,85 @@ export class CharacterPreview extends BaseScene {
     decepticon.initializePhysics();
     this.characters.push(decepticon);
 
+    // Set up input to move characters
+
+    // control first character with mouse click
+    this.goToPointClick(this.characters[0]);
+
+    // make second character move to random point every 2 seconds
     setInterval(() => {
-      this.characters.forEach((character) => {
-        this.setRandomMovement(character);
-      });
-    }, 1000);
+      this.goToRandomPoint(this.characters[1]);
+    }, 2000);
   }
 
-  // update() {
-  //   this.characters.forEach((character) => {
-  //     this.setRandomMovement(character);
-  //   });
-  // }
+  update() {
+    this.processCollisions();
+  }
 
-  setRandomMovement(character) {
+  processCollisions() {
+    // punchIfClose
+    this.characters.forEach((charA) => {
+      this.characters.forEach((charB) => {
+        if (charA !== charB) {
+          const distance = Phaser.Math.Distance.Between(
+            charA.sprite.x,
+            charA.sprite.y,
+            charB.sprite.x,
+            charB.sprite.y
+          );
+
+          if (distance < 100) {
+            console.log('punch');
+            
+            charA.play('punch');
+          }
+        }
+      });
+    });
+  }
+
+  goToPointClick(character) {
+    this.input.on('pointerdown', (pointer) => {
+      console.log(pointer.x, pointer.y);
+      
+      this.physics.moveTo(character.sprite, pointer.x, pointer.y, character.speed * 100);
+      character.play('walk');
+
+      const distance = Phaser.Math.Distance.Between(
+        character.sprite.x,
+        character.sprite.y,
+        pointer.x,
+        pointer.y
+      );
+
+      this.time.delayedCall((distance / (character.speed * 100)) * 1000, () => {
+        character.sprite.body.setVelocity(0);
+        character.play('idle');
+      });
+    });
+  }
+
+  goToRandomPoint(character) {
+    const randomX = Phaser.Math.Between(100, this.scale.width - 100);
+    const randomY = Phaser.Math.Between(100, this.scale.height - 100);
+
+    this.physics.moveTo(character.sprite, randomX, randomY, character.speed * 100);
+    character.play('walk');
+
+    const distance = Phaser.Math.Distance.Between(
+      character.sprite.x,
+      character.sprite.y,
+      randomX,
+      randomY
+    );
+
+    this.time.delayedCall((distance / (character.speed * 100)) * 1000, () => {
+      character.sprite.body.setVelocity(0);
+      character.play('idle');
+    });
+  }
+
+  setRandomLateralMovement(character) {
     const directions = ['left', 'right', 'idle'];
     const choice = directions[Math.floor(Math.random() * directions.length)];
 

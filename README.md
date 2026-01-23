@@ -9,4 +9,7 @@
 
 **To Do**
 
-
+[] add optimust hurt animation
+[] add decepticon punch or shoot animation
+[] add health bars
+[] reduce health on hit
