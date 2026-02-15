@@ -39,6 +39,8 @@ export class CharacterPreview extends BaseScene {
 
     // control first character with mouse click
     this.goToPointClick(this.characters[0]);
+    this.punchOnSpace(this.characters[0]);
+    this.cardinalMovementWASD(this.characters[0]);
 
     // make second character move to random point every 2 seconds
     setInterval(() => {
@@ -47,7 +49,87 @@ export class CharacterPreview extends BaseScene {
   }
 
   update() {
-    this.processCollisions();
+    // this.processCollisions();
+    // ensure character flashes when overlapped and punched
+    this.characters.forEach((character) => {
+      this.processFlashWhenCollideAndHit(character);
+    });
+  }
+
+  flashWhenHit(character) {
+    character.sprite.setTint(0xff0000);
+    setTimeout(() => {
+      character.sprite.clearTint();
+    }, 200);
+  }
+
+  processFlashWhenCollideAndHit(character) {
+    this.characters.forEach((other) => {
+      if (other !== character) {
+        const distance = Phaser.Math.Distance.Between(
+          character.sprite.x,
+          character.sprite.y,
+          other.sprite.x,
+          other.sprite.y
+        );
+
+        if (distance < 300) {
+          console.log(character.sprite.anims.currentAnim.key);
+          
+          if (character.sprite.anims.currentAnim.key === character.spritesheetName + '-punch') {
+            this.flashWhenHit(other);
+          }
+        }
+      }
+    });
+  }
+
+  punchOnSpace(character) {
+    this.input.keyboard.on('keydown-SPACE', () => {
+      console.log('punch');
+      
+      character.play('punch');
+
+      setTimeout(() => {
+        character.play('idle');
+      }, 500);
+    });
+  }
+
+  cardinalMovementWASD(character) {
+    this.input.keyboard.on('keydown', (event) => {
+      switch (event.code) {
+        case 'KeyW':
+          character.sprite.body.setVelocityY(-character.speed * 100);
+          character.play('walk');
+          break;
+        case 'KeyS':
+          character.sprite.body.setVelocityY(character.speed * 100);
+          character.play('walk');
+          break;
+        case 'KeyA':
+          character.sprite.body.setVelocityX(-character.speed * 100);
+          character.play('walk');
+          character.sprite.setFlipX(true);
+          break;
+        case 'KeyD':
+          character.sprite.body.setVelocityX(character.speed * 100);
+          character.play('walk');
+          character.sprite.setFlipX(false);
+          break;
+      }
+    });
+
+    this.input.keyboard.on('keyup', (event) => {
+      switch (event.code) {
+        case 'KeyW':
+        case 'KeyS':
+        case 'KeyA':
+        case 'KeyD':
+          character.sprite.body.setVelocity(0);
+          character.play('idle');
+      }
+    });
   }
 
   processCollisions() {
