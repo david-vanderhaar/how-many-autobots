@@ -6,6 +6,7 @@ export class CharacterPreview extends BaseScene {
     super('CharacterPreview');
 
     this.characters = [];
+    this.projectiles = null;
   }
 
   create() {
@@ -35,6 +36,24 @@ export class CharacterPreview extends BaseScene {
     decepticon.initializePhysics();
     this.characters.push(decepticon);
 
+    this.projectiles = this.physics.add.group();
+    this.physics.add.overlap(
+      this.projectiles,
+      this.characters[0].sprite,
+      (obj1, obj2) => {
+        const projectile = this.projectiles.contains(obj1) ? obj1 : obj2;
+        projectile.destroy();
+        this.flashWhenHit(this.characters[0]);
+      }
+    );
+
+    this.time.addEvent({
+      delay: 500,
+      callback: this.maybeShootAtPlayer,
+      callbackScope: this,
+      loop: true,
+    });
+
     // Set up input to move characters
 
     // control first character with mouse click
@@ -53,6 +72,55 @@ export class CharacterPreview extends BaseScene {
     // ensure character flashes when overlapped and punched
     this.characters.forEach((character) => {
       this.processFlashWhenCollideAndHit(character);
+    });
+
+    if (this.projectiles) {
+      this.projectiles.getChildren().forEach((projectile) => {
+        if (!projectile) {
+          return;
+        }
+
+        if (
+          projectile.x < 0 ||
+          projectile.x > this.scale.width ||
+          projectile.y < 0 ||
+          projectile.y > this.scale.height
+        ) {
+          projectile.destroy();
+        }
+      });
+    }
+  }
+
+  maybeShootAtPlayer() {
+    if (this.characters.length < 2) {
+      return;
+    }
+
+    const shooter = this.characters[1];
+    const target = this.characters[0];
+    const shootChance = 50; // percent chance each interval
+
+    if (Phaser.Math.Between(1, 100) <= shootChance) {
+      this.shootProjectileAtPlayer(shooter, target);
+    }
+  }
+
+  shootProjectileAtPlayer(shooter, target) {
+    const projectile = this.add.rectangle(shooter.sprite.x, shooter.sprite.y, 32, 32, 0x673ab7);
+    this.physics.add.existing(projectile);
+    projectile.body.setAllowGravity(false);
+    projectile.body.setCollideWorldBounds(true);
+    projectile.body.setBounce(0, 0);
+    projectile.body.setVelocity(0, 0);
+
+    this.projectiles.add(projectile);
+    this.physics.moveToObject(projectile, target.sprite, 500);
+
+    this.time.delayedCall(3000, () => {
+      if (projectile && projectile.active) {
+        projectile.destroy();
+      }
     });
   }
 

@@ -42,7 +42,7 @@ export function BaseCharacter(scene, {
 
 function initializeSprite(scene, x, y, flipRight) {
   const sprite = scene.add.sprite(x, y);
-  sprite.setScale(8);
+  sprite.setScale(4);
   sprite.setFlipX(flipRight);
 
   return sprite;
